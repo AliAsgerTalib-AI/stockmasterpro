@@ -1,0 +1,119 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: products
+    // Fields: name, sku, categoryId, unit, purchasePrice, sellingPrice, minStockLevel, currentStock, description, status, updatedAt
+    //
+    // Collection: categories
+    // Fields: name
+    //
+    // Collection: suppliers
+    // Fields: name, contactPerson, phone, email, address
+    //
+    // Collection: customers
+    // Fields: name, phone, email, address
+    //
+    // Collection: transactions
+    // Fields: type, date, entityId, totalAmount, status, notes
+    //
+    // Collection: transactionItems
+    // Fields: transactionId, productId, quantity, unitPrice, amount
+    //
+    // Collection: stockMovements
+    // Fields: productId, date, type, qtyIn, qtyOut, balanceQty, referenceId
+    //
+    // Collection: users
+    // Fields: name, email, role
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "aliasgertalib@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidString(field, min, max) {
+      return request.resource.data[field] is string && 
+             request.resource.data[field].size() >= min && 
+             request.resource.data[field].size() <= max;
+    }
+
+    function isValidNumber(field, min) {
+      return request.resource.data[field] is number && request.resource.data[field] >= min;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId) && 
+                      hasRequiredFields(['name', 'email', 'role']) &&
+                      request.resource.data.role == 'staff'; // Default role for self-signup
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+    }
+
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /suppliers/{supplierId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /customers/{customerId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); // Staff can create transactions
+      allow update, delete: if isAdmin();
+    }
+
+    match /transactionItems/{itemId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    match /stockMovements/{movementId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+  }
+}

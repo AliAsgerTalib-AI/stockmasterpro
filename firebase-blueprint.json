@@ -1,0 +1,108 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Inventory items",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Product name" },
+        "sku": { "type": "string", "description": "Stock Keeping Unit" },
+        "categoryId": { "type": "string", "description": "Category ID" },
+        "unit": { "type": "string", "description": "Unit (Nos, Kg, Box)" },
+        "purchasePrice": { "type": "number", "description": "Purchase price" },
+        "sellingPrice": { "type": "number", "description": "Selling price" },
+        "minStockLevel": { "type": "number", "description": "Minimum stock level for alerts" },
+        "currentStock": { "type": "number", "description": "Current available quantity" },
+        "description": { "type": "string", "description": "Product description" },
+        "status": { "type": "string", "enum": ["Active", "Inactive"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "sku", "categoryId", "unit", "purchasePrice", "sellingPrice", "minStockLevel", "currentStock"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product categories",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Category name" }
+      },
+      "required": ["name"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Product suppliers",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "contactPerson": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customers for sales",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Purchase or Sales transaction",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["Purchase", "Sale"] },
+        "date": { "type": "string", "format": "date-time" },
+        "entityId": { "type": "string", "description": "SupplierID or CustomerID" },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Completed", "Pending", "Cancelled"] },
+        "notes": { "type": "string" }
+      },
+      "required": ["type", "date", "entityId", "totalAmount", "status"]
+    },
+    "TransactionItem": {
+      "title": "TransactionItem",
+      "description": "Line items for transactions",
+      "type": "object",
+      "properties": {
+        "transactionId": { "type": "string" },
+        "productId": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unitPrice": { "type": "number" },
+        "amount": { "type": "number" }
+      },
+      "required": ["transactionId", "productId", "quantity", "unitPrice", "amount"]
+    },
+    "StockMovement": {
+      "title": "StockMovement",
+      "description": "Ledger of all stock changes",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["Purchase", "Sale", "Adjustment", "Return"] },
+        "qtyIn": { "type": "number" },
+        "qtyOut": { "type": "number" },
+        "balanceQty": { "type": "number" },
+        "referenceId": { "type": "string", "description": "TransactionID or AdjustmentID" }
+      },
+      "required": ["productId", "date", "type", "qtyIn", "qtyOut", "balanceQty"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": { "schema": "Product", "description": "Products collection" },
+    "/categories/{categoryId}": { "schema": "Category", "description": "Categories collection" },
+    "/suppliers/{supplierId}": { "schema": "Supplier", "description": "Suppliers collection" },
+    "/customers/{customerId}": { "schema": "Customer", "description": "Customers collection" },
+    "/transactions/{transactionId}": { "schema": "Transaction", "description": "Transactions collection" },
+    "/transactionItems/{itemId}": { "schema": "TransactionItem", "description": "Transaction items" },
+    "/stockMovements/{movementId}": { "schema": "StockMovement", "description": "Stock movement ledger" }
+  }
+}

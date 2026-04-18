@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Georgia", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-background: #f4f3ef;
+  --color-foreground: #1a1a1a;
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1a1a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1a1a1a;
+  --color-primary: #1a1a1a;
+  --color-primary-foreground: #f4f3ef;
+  --color-secondary: #e2e1dd;
+  --color-secondary-foreground: #1a1a1a;
+  --color-muted: #e0dfdb;
+  --color-muted-foreground: #757575;
+  --color-accent: #d44d2e;
+  --color-accent-foreground: #f4f3ef;
+  --color-destructive: #d44d2e;
+  --color-border: #e0dfdb;
+  --color-input: #e0dfdb;
+  --color-ring: #1a1a1a;
+
+  --radius-none: 0px;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+.editorial-h1 {
+  @apply font-serif italic text-[42px] font-normal tracking-[-1px] border-b-2 border-primary pb-3;
+}
+
+.editorial-h2 {
+  @apply font-serif text-2xl font-bold uppercase tracking-[1px] mb-5;
+}
+
+.editorial-label {
+  @apply text-[11px] uppercase tracking-[1.5px] font-bold text-muted-foreground;
+}
+
+.editorial-stat {
+  @apply font-serif text-[56px] leading-none mb-2;
+}
+
+.editorial-table-header {
+  @apply text-[10px] uppercase tracking-[1px] font-bold text-muted-foreground border-b border-primary py-3;
+}
+
+.editorial-sku {
+  @apply font-mono bg-[#e2e1dd] px-1.5 py-0.5 rounded-sm text-[11px];
+}
+
+.editorial-box-inverted {
+  @apply bg-primary text-background p-5;
+}
