@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { PageHeader } from './layout/PageHeader';
 
 export default function Reports() {
-  const { products, transactions, loading } = useReports();
+  const { products, transactions, units, loading } = useReports();
 
   if (loading) return <div className="h-48 flex items-center justify-center font-serif italic text-lg opacity-50">Indexing archives...</div>;
 
@@ -62,13 +62,20 @@ export default function Reports() {
                     <TableCell colSpan={3} className="h-32 text-center text-muted-foreground italic font-serif">All stock levels are healthy.</TableCell>
                   </TableRow>
                 ) : (
-                  lowStockItems.map(p => (
-                    <TableRow key={p.id} className="border-b border-border hover:bg-white transition-colors">
-                      <TableCell className="py-4 font-serif italic text-lg">{p.name}</TableCell>
-                      <TableCell className="text-right font-serif text-xl text-accent">{p.currentStock}</TableCell>
-                      <TableCell className="text-right text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{p.minStockLevel}</TableCell>
-                    </TableRow>
-                  ))
+                  lowStockItems.map(p => {
+                    const unitAbbr = units.find(u => u.id === p.unitId)?.abbreviation || p.unit || 'UNIT';
+                    return (
+                      <TableRow key={p.id} className="border-b border-border hover:bg-white transition-colors">
+                        <TableCell className="py-4 font-serif italic text-lg">{p.name}</TableCell>
+                        <TableCell className="text-right font-serif text-xl text-accent">
+                          {p.currentStock} <span className="text-[10px] uppercase tracking-widest font-bold opacity-50">{unitAbbr}</span>
+                        </TableCell>
+                        <TableCell className="text-right text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
+                          {p.minStockLevel} {unitAbbr}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

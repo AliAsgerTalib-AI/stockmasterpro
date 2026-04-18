@@ -45,7 +45,7 @@ import { toast } from 'sonner';
 import { TransactionService } from '../services/transactionService';
 
 export default function Transactions() {
-  const { transactions, products, suppliers, customers, loading, refresh } = useTransactions();
+  const { transactions, products, suppliers, customers, units, loading, refresh } = useTransactions();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<'Purchase' | 'Sale'>('Sale');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -130,11 +130,13 @@ export default function Transactions() {
           <Button variant="ghost" onClick={() => setTransactionType('Purchase')} className={`editorial-h2 mb-0 h-auto p-0 min-w-0 transition-all ${transactionType === 'Purchase' ? 'text-primary border-b-2 border-accent' : 'text-muted-foreground opacity-50 hover:opacity-100'}`}>Purchases</Button>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="rounded-none bg-primary hover:bg-accent text-background text-xs uppercase tracking-[2px] font-bold px-8 h-12 transition-all">
-              <Plus className="h-4 w-4 mr-2" /> New {transactionType === 'Sale' ? 'Sales' : 'Purchase'}
-            </Button>
-          </DialogTrigger>
+          <DialogTrigger
+            render={
+              <Button className="rounded-none bg-primary hover:bg-accent text-background text-xs uppercase tracking-[2px] font-bold px-8 h-12 transition-all">
+                <Plus className="h-4 w-4 mr-2" /> New {transactionType === 'Sale' ? 'Sales' : 'Purchase'}
+              </Button>
+            }
+          />
           <DialogContent className="sm:max-w-[700px] bg-background border-2 border-primary rounded-none shadow-[20px_20px_0px_rgba(26,26,26,0.1)] max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle className="font-serif italic text-3xl">Record {transactionType}</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-8 py-6">
@@ -154,15 +156,17 @@ export default function Transactions() {
                 <div className="space-y-2">
                   <Label className="editorial-label">Date of Entry *</Label>
                   <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start text-left h-10 rounded-none border border-primary bg-white text-xs font-bold uppercase tracking-widest hover:bg-muted"
-                      >
-                        <CalendarIcon className="h-3 w-3 mr-2" />
-                        {formData.date ? format(formData.date, 'PPP') : <span>Pick a date</span>}
-                      </Button>
-                    </PopoverTrigger>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-left h-10 rounded-none border border-primary bg-white text-xs font-bold uppercase tracking-widest hover:bg-muted"
+                        >
+                          <CalendarIcon className="h-3 w-3 mr-2" />
+                          {formData.date ? format(formData.date, 'PPP') : <span>Pick a date</span>}
+                        </Button>
+                      }
+                    />
                     <PopoverContent className="w-auto p-0 rounded-none border-primary bg-background shadow-[10px_10px_0px_rgba(26,26,26,0.1)]">
                       <Calendar
                         mode="single"
@@ -193,7 +197,9 @@ export default function Transactions() {
                         </Select>
                       </div>
                       <div className="col-span-2 space-y-2">
-                        <Label className="text-[9px] uppercase tracking-widest text-muted-foreground font-black">Qty *</Label>
+                        <Label className="text-[9px] uppercase tracking-widest text-muted-foreground font-black">
+                          Qty {item.productId && `(${units.find(u => u.id === products.find(p => p.id === item.productId)?.unitId)?.abbreviation || products.find(p => p.id === item.productId)?.unit || 'UNIT'})`} *
+                        </Label>
                         <Input type="number" min="1" className="rounded-none border-primary bg-white" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))} />
                       </div>
                       <div className="col-span-2 space-y-2">
@@ -291,7 +297,7 @@ export default function Transactions() {
                                     <span className="block editorial-sku mt-1">{product?.sku || 'N/A'}</span>
                                   </div>
                                   <div className="col-span-2 text-center font-serif text-xl tracking-tighter text-accent">
-                                    {item.quantity}
+                                    {item.quantity} <span className="text-[9px] uppercase tracking-widest font-black opacity-40">{units.find(u => u.id === product?.unitId)?.abbreviation || product?.unit || 'UNIT'}</span>
                                   </div>
                                   <div className="col-span-2 text-right font-serif text-lg tracking-tight text-muted-foreground">
                                     ${item.unitPrice?.toLocaleString()}

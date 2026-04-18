@@ -5,9 +5,11 @@ import { Product, Transaction, Category } from '../types';
 import { toCamelCase } from '../lib/utils';
 import { QUERY_KEYS } from '../lib/queryKeys';
 import { MOCK_PRODUCTS, MOCK_TRANSACTIONS, MOCK_CATEGORIES } from '../lib/mockData';
+import { useUnits } from './useUnits';
 
 export function useReports() {
   const queryClient = useQueryClient();
+  const { units } = useUnits();
 
   const productsQuery = useQuery({
     queryKey: QUERY_KEYS.products,
@@ -59,6 +61,7 @@ export function useReports() {
     products: productsQuery.data || [], 
     transactions: transactionsQuery.data || [], 
     categories: categoriesQuery.data || [], 
+    units,
     loading: isInitialLoading, 
     refresh: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products });

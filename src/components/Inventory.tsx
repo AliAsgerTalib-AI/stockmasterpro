@@ -9,7 +9,8 @@ const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   sku: z.string().min(1, 'SKU is required'),
   categoryId: z.string().min(1, 'Please select a category'),
-  unit: z.string().default('Nos'),
+  unitId: z.string().min(1, 'Please select a unit'),
+  unit: z.string().optional(),
   purchasePrice: z.number().min(0, 'Purchase price cannot be negative'),
   sellingPrice: z.number().min(0, 'Selling price cannot be negative'),
   minStockLevel: z.number().min(0, 'Min stock level cannot be negative'),
@@ -26,6 +27,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from './layout/PageHeader';
 import { CategoryManager } from './CategoryManager';
+import { UnitManager } from './UnitManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -55,7 +57,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 export default function Inventory() {
-  const { products, categories, loading } = useInventory();
+  const { products, categories, units, loading } = useInventory();
   const [search, setSearch] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -64,7 +66,8 @@ export default function Inventory() {
     name: '',
     sku: '',
     categoryId: '',
-    unit: 'Nos',
+    unitId: '',
+    unit: '',
     purchasePrice: 0,
     sellingPrice: 0,
     minStockLevel: 5,
@@ -122,7 +125,8 @@ export default function Inventory() {
       name: '',
       sku: '',
       categoryId: '',
-      unit: 'Nos',
+      unitId: '',
+      unit: '',
       purchasePrice: 0,
       sellingPrice: 0,
       minStockLevel: 5,
@@ -155,15 +159,18 @@ export default function Inventory() {
           </div>
           <div className="flex items-center gap-3">
             <CategoryManager />
+            <UnitManager />
             <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
               setIsAddDialogOpen(open);
               if (!open) { setEditingProduct(null); resetForm(); }
             }}>
-              <DialogTrigger asChild>
-                <Button className="rounded-none bg-primary hover:bg-accent text-background text-xs uppercase tracking-[2px] font-bold px-8 h-12 transition-all">
-                  <Plus className="h-4 w-4 mr-2" /> Add Entry
-                </Button>
-              </DialogTrigger>
+              <DialogTrigger
+                render={
+                  <Button className="rounded-none bg-primary hover:bg-accent text-background text-xs uppercase tracking-[2px] font-bold px-8 h-12 transition-all">
+                    <Plus className="h-4 w-4 mr-2" /> Add Entry
+                  </Button>
+                }
+              />
               <DialogContent className="sm:max-w-[600px] bg-background border-2 border-primary rounded-none shadow-[20px_20px_0px_rgba(26,26,26,0.1)]">
                 <DialogHeader>
                   <DialogTitle className="font-serif italic text-3xl">{editingProduct ? 'Modify Entry' : 'New Entry'}</DialogTitle>
@@ -189,14 +196,16 @@ export default function Inventory() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="editorial-label">Unit</Label>
-                <Select value={formData.unit} onValueChange={(v) => setFormData({...formData, unit: v})}>
-                  <SelectTrigger className="rounded-none border-primary"><SelectValue /></SelectTrigger>
+                <Label className="editorial-label">Unit *</Label>
+                <Select value={formData.unitId} onValueChange={(v) => {
+                  const u = units.find(unit => unit.id === v);
+                  setFormData({...formData, unitId: v, unit: u?.abbreviation || ''});
+                }}>
+                  <SelectTrigger className="rounded-none border-primary">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
                   <SelectContent className="bg-background border-primary rounded-none">
-                    <SelectItem value="Nos">Nos</SelectItem>
-                    <SelectItem value="Kg">Kg</SelectItem>
-                    <SelectItem value="Box">Box</SelectItem>
-                    <SelectItem value="Ltr">Ltr</SelectItem>
+                    {units.map(u => <SelectItem key={u.id} value={u.id}>{u.name} ({u.abbreviation})</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -260,7 +269,9 @@ export default function Inventory() {
                   <TableCell className="text-right">
                     <div className="flex flex-col items-end">
                       <span className={`font-serif text-2xl tracking-tight ${product.currentStock <= product.minStockLevel ? 'text-accent' : 'text-primary'}`}>{product.currentStock}</span>
-                      <span className="text-[9px] uppercase tracking-[1px] font-bold text-muted-foreground">{product.unit}</span>
+                      <span className="text-[9px] uppercase tracking-[1px] font-bold text-muted-foreground">
+                        {units.find(u => u.id === product.unitId)?.abbreviation || product.unit || 'Nos'}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
@@ -279,7 +290,8 @@ export default function Inventory() {
                             name: product.name,
                             sku: product.sku,
                             categoryId: product.categoryId || '',
-                            unit: product.unit,
+                            unitId: product.unitId || '',
+                            unit: product.unit || '',
                             purchasePrice: product.purchasePrice,
                             sellingPrice: product.sellingPrice,
                             minStockLevel: product.minStockLevel,

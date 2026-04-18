@@ -6,8 +6,11 @@ import { toCamelCase } from '../lib/utils';
 import { QUERY_KEYS } from '../lib/queryKeys';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../lib/mockData';
 
+import { useUnits } from './useUnits';
+
 export function useInventory() {
   const queryClient = useQueryClient();
+  const { units } = useUnits();
 
   const productsQuery = useQuery({
     queryKey: QUERY_KEYS.products,
@@ -46,6 +49,7 @@ export function useInventory() {
   return { 
     products: productsQuery.data || [], 
     categories: categoriesQuery.data || [], 
+    units,
     loading: productsQuery.isPending || categoriesQuery.isPending,
     refresh: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products });

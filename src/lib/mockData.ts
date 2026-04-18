@@ -1,4 +1,11 @@
-import { Product, Transaction, Category, Supplier, Customer, StockMovement } from '../types';
+import { Product, Transaction, Category, Supplier, Customer, StockMovement, Unit } from '../types';
+
+export const MOCK_UNITS: Unit[] = [
+  { id: 'unit-1', name: 'Pieces', abbreviation: 'pcs', description: 'Individual standalone items' },
+  { id: 'unit-2', name: 'Kilograms', abbreviation: 'kg', description: 'Weight-based measurement' },
+  { id: 'unit-3', name: 'Liters', abbreviation: 'ltr', description: 'Volume-based measurement' },
+  { id: 'unit-4', name: 'Boxes', abbreviation: 'box', description: 'Standard packaging unit' },
+];
 
 export const MOCK_CATEGORIES: Category[] = [
   { id: 'cat-1', name: 'Electronics', description: 'Gadgets and electronic components' },
@@ -12,7 +19,8 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Industrial Sensor X-100',
     sku: 'SN-X100-BL',
     categoryId: 'cat-1',
-    unit: 'Units',
+    unit: 'Pieces',
+    unitId: 'unit-1',
     purchasePrice: 45.00,
     sellingPrice: 89.99,
     minStockLevel: 20,
@@ -26,7 +34,8 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Precision Gear Assembly',
     sku: 'GA-P500-ST',
     categoryId: 'cat-3',
-    unit: 'Units',
+    unit: 'Pieces',
+    unitId: 'unit-1',
     purchasePrice: 120.00,
     sellingPrice: 245.00,
     minStockLevel: 10,
@@ -40,7 +49,8 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Premium Bond Paper',
     sku: 'PA-BOND-A4',
     categoryId: 'cat-2',
-    unit: 'Reams',
+    unit: 'Boxes',
+    unitId: 'unit-4',
     purchasePrice: 4.50,
     sellingPrice: 8.00,
     minStockLevel: 50,

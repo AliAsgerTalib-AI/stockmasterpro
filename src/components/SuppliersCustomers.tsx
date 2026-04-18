@@ -100,11 +100,13 @@ export default function SuppliersCustomers() {
             </TabsList>
           </Tabs>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="rounded-none bg-primary hover:bg-accent text-background text-xs uppercase tracking-[2px] font-bold px-8 h-12 transition-all">
-                <Plus className="h-4 w-4 mr-2" /> Add {activeTab === 'suppliers' ? 'Supplier' : 'Customer'}
-              </Button>
-            </DialogTrigger>
+            <DialogTrigger
+              render={
+                <Button className="rounded-none bg-primary hover:bg-accent text-background text-xs uppercase tracking-[2px] font-bold px-8 h-12 transition-all">
+                  <Plus className="h-4 w-4 mr-2" /> Add {activeTab === 'suppliers' ? 'Supplier' : 'Customer'}
+                </Button>
+              }
+            />
             <DialogContent className="sm:max-w-[500px] bg-background border-2 border-primary rounded-none shadow-[20px_20px_0px_rgba(26,26,26,0.1)]">
               <DialogHeader><DialogTitle className="font-serif italic text-3xl">New {activeTab === 'suppliers' ? 'Supplier' : 'Customer'}</DialogTitle></DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-6 py-6">

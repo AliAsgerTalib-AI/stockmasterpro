@@ -15,6 +15,7 @@ import {
   ArrowDownLeft,
   History,
   Settings,
+  Ruler,
   Menu,
   X
 } from 'lucide-react';
@@ -27,6 +28,7 @@ import { toast } from 'sonner';
 // Components
 import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
+import UnitsScreen from './components/UnitsScreen';
 import Transactions from './components/Transactions';
 import Reports from './components/Reports';
 import SuppliersCustomers from './components/SuppliersCustomers';
@@ -232,6 +234,7 @@ export default function App() {
   const navItems = [
     { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'inventory', path: '/inventory', label: 'Inventory', icon: Package },
+    { id: 'units', path: '/units', label: 'Units', icon: Ruler },
     { id: 'transactions', path: '/transactions', label: 'Transactions', icon: ShoppingCart },
     { id: 'contacts', path: '/contacts', label: 'Suppliers & Customers', icon: Users },
     { id: 'reports', path: '/reports', label: 'Reports', icon: BarChart3 },
@@ -341,6 +344,7 @@ export default function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/inventory" element={<Inventory />} />
+            <Route path="/units" element={<UnitsScreen />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/contacts" element={<SuppliersCustomers />} />

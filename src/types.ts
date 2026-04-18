@@ -4,6 +4,7 @@ export interface Product {
   sku: string;
   categoryId: string;
   unit: string;
+  unitId?: string;
   purchasePrice: number;
   sellingPrice: number;
   minStockLevel: number;
@@ -16,6 +17,13 @@ export interface Product {
 export interface Category {
   id: string;
   name: string;
+  description?: string;
+}
+
+export interface Unit {
+  id: string;
+  name: string;
+  abbreviation: string;
   description?: string;
 }
 
