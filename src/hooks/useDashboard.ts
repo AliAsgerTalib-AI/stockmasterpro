@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase, isConfigured } from '../lib/supabase';
+import { supabase, isConfigured, isDemoMode } from '../lib/supabase';
 import { Product, Transaction, StockMovement } from '../types';
 import { toCamelCase } from '../lib/utils';
 import { QUERY_KEYS } from '../lib/queryKeys';
@@ -12,7 +12,7 @@ export function useDashboard() {
   const productsQuery = useQuery({
     queryKey: QUERY_KEYS.products,
     queryFn: async () => {
-      if (!isConfigured) return MOCK_PRODUCTS;
+      if (isDemoMode()) return MOCK_PRODUCTS;
       const { data, error } = await supabase.from('products').select('*');
       if (error) throw error;
       return toCamelCase(data || []) as Product[];
@@ -22,7 +22,7 @@ export function useDashboard() {
   const transactionsQuery = useQuery({
     queryKey: QUERY_KEYS.transactions,
     queryFn: async () => {
-      if (!isConfigured) return MOCK_TRANSACTIONS;
+      if (isDemoMode()) return MOCK_TRANSACTIONS;
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
@@ -36,7 +36,7 @@ export function useDashboard() {
   const movementsQuery = useQuery({
     queryKey: QUERY_KEYS.movements,
     queryFn: async () => {
-      if (!isConfigured) return MOCK_MOVEMENTS;
+      if (isDemoMode()) return MOCK_MOVEMENTS;
       const { data, error } = await supabase
         .from('stock_movements')
         .select('*')
@@ -64,13 +64,13 @@ export function useDashboard() {
     return () => { channel.unsubscribe(); };
   }, [queryClient]);
 
-  const isLoading = productsQuery.isLoading || transactionsQuery.isLoading || movementsQuery.isLoading;
+  const isInitialLoading = productsQuery.isPending || transactionsQuery.isPending || movementsQuery.isPending;
 
   return { 
     products: productsQuery.data || [], 
     transactions: transactionsQuery.data || [], 
     movements: movementsQuery.data || [], 
-    loading: isLoading, 
+    loading: isInitialLoading, 
     refresh: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.transactions });

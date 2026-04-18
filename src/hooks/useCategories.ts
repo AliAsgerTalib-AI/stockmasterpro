@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase, handleSupabaseError, OperationType, isConfigured } from '../lib/supabase';
+import { supabase, handleSupabaseError, OperationType, isConfigured, isDemoMode } from '../lib/supabase';
 import { Category } from '../types';
 import { toCamelCase, toSnakeCase } from '../lib/utils';
 import { toast } from 'sonner';
@@ -13,7 +13,7 @@ export function useCategories() {
   const categoriesQuery = useQuery({
     queryKey: QUERY_KEYS.categories,
     queryFn: async () => {
-      if (!isConfigured) return MOCK_CATEGORIES;
+      if (isDemoMode()) return MOCK_CATEGORIES;
       const { data, error } = await supabase.from('categories').select('*').order('name');
       if (error) throw error;
       return toCamelCase(data || []) as Category[];
@@ -71,7 +71,7 @@ export function useCategories() {
 
   return { 
     categories: categoriesQuery.data || [], 
-    loading: categoriesQuery.isLoading, 
+    loading: categoriesQuery.isPending, 
     addCategory, 
     updateCategory, 
     deleteCategory, 

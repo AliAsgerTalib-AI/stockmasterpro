@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase, handleSupabaseError, OperationType, isConfigured } from '../lib/supabase';
+import { supabase, handleSupabaseError, OperationType, isConfigured, isDemoMode } from '../lib/supabase';
 import { Supplier, Customer } from '../types';
 import { toCamelCase } from '../lib/utils';
 import { QUERY_KEYS } from '../lib/queryKeys';
@@ -12,7 +12,7 @@ export function useSuppliersCustomers() {
   const suppliersQuery = useQuery({
     queryKey: QUERY_KEYS.suppliers,
     queryFn: async () => {
-      if (!isConfigured) return MOCK_SUPPLIERS;
+      if (isDemoMode()) return MOCK_SUPPLIERS;
       const { data, error } = await supabase.from('suppliers').select('*');
       if (error) throw error;
       return toCamelCase(data || []) as Supplier[];
@@ -22,7 +22,7 @@ export function useSuppliersCustomers() {
   const customersQuery = useQuery({
     queryKey: QUERY_KEYS.customers,
     queryFn: async () => {
-      if (!isConfigured) return MOCK_CUSTOMERS;
+      if (isDemoMode()) return MOCK_CUSTOMERS;
       const { data, error } = await supabase.from('customers').select('*');
       if (error) throw error;
       return toCamelCase(data || []) as Customer[];
@@ -55,12 +55,12 @@ export function useSuppliersCustomers() {
     }
   };
 
-  const isLoading = suppliersQuery.isLoading || customersQuery.isLoading;
+  const isInitialLoading = suppliersQuery.isPending || customersQuery.isPending;
 
   return { 
     suppliers: suppliersQuery.data || [], 
     customers: customersQuery.data || [], 
-    loading: isLoading, 
+    loading: isInitialLoading, 
     refresh: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.suppliers });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customers });

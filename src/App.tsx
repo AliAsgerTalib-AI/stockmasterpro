@@ -100,6 +100,7 @@ export default function App() {
   };
 
   const handleDemoMode = () => {
+    import('./lib/supabase').then(({ setForcedDemoMode }) => setForcedDemoMode(true));
     setUser({
       id: 'demo-user-id',
       email: 'demo@stockmaster.pro',

@@ -51,6 +51,13 @@ if (isConfigured) {
 }
 console.groupEnd();
 
+let forcedDemo = false;
+export const isDemoMode = () => !isConfigured || forcedDemo;
+export const setForcedDemoMode = (val: boolean) => {
+  forcedDemo = val;
+  console.log('Forced Demo Mode set to:', val);
+};
+
 export { isConfigured };
 
 // Proxy to prevent top-level crashes and "cannot read property of null" errors throughout the app
